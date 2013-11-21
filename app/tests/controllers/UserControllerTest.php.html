@@ -1,0 +1,70 @@
+<?php
+
+class UserControllerTest extends TestCase {
+	/**
+   * Set up
+   */
+  public function setUp()
+  {
+    parent::setUp();
+
+    $this->mock = $this->mock('l4-twitter\Storage\User\UserRepository');
+  }
+
+  /**
+   * Tear down
+   */
+  public function tearDown()
+  {
+    Mockery::close();
+  }
+
+  /**
+   * Mock
+   */
+  public function mock($class)
+  {
+    $mock = Mockery::mock($class);
+
+    $this->app->instance($class, $mock);
+
+    return $mock;
+  }
+
+  /**
+   * Test Index
+   */
+  public function testIndex()
+  {
+    $this->mock->shouldReceive('all')->once();
+
+    $this->call('GET', 'user');
+
+    $this->assertResponseOk();
+  }
+
+  /**
+   * Test Create
+   */
+  public function testCreate()
+  {
+    $this->call('GET', 'user/create');
+
+    $this->assertResponseOk();
+  }
+
+  public function testStoreFails()
+  {
+    $this->mock->shouldReceive('create')
+               ->once()
+               ->andReturn(Mockery::mock(array(
+                   'isSaved' => false,
+                   'errors' => array()
+                 )));
+   
+    $this->call('POST', 'users');
+   
+    $this->assertRedirectedToRoute('users.create');
+    $this->assertSessionHasErrors();
+  }
+}
