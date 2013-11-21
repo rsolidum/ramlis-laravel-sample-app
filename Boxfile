@@ -20,7 +20,7 @@ web1:
     - memcached
     - curl
   before_deploy:
-    - "chmod -R 755 *"
+    - "chmod -R 755 /var/www/app/storage"
     - "php artisan migrate:install"
     - "php artisan migrate"
   after_deploy:
